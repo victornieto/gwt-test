@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:sec="http://www.springframework.org/schema/security" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:oxm="http://www.springframework.org/schema/oxm" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+						http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+						http://www.springframework.org/schema/context 
+						http://www.springframework.org/schema/context/spring-context-2.5.xsd
+						http://www.springframework.org/schema/oxm 
+						http://www.springframework.org/schema/oxm/spring-oxm-3.0.xsd
+					    http://www.springframework.org/schema/tx 
+					    http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+     					http://www.springframework.org/schema/aop 
+     					http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+     					http://www.springframework.org/schema/security 
+     					http://www.springframework.org/schema/security/spring-security-3.0.xsd
+     					http://www.springframework.org/schema/task 
+     					http://www.springframework.org/schema/task/spring-task-3.0.xsd
+     					http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
+
+
+	<import resource="classpath:META-INF/cxf/cxf.xml" />
+	<import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
+
+	<!-- Annotation -->
+	<context:annotation-config />
+	<context:component-scan base-package="com.vistage.testgwt.server" />
+
+	<context:property-placeholder
+		location="classpath:/application.properties" />
+
+	<jaxrs:server id="restBackendWebService" address="/">
+		<jaxrs:providers>
+			<bean id="jsonProvider" class="org.apache.cxf.jaxrs.provider.json.JSONProvider" />
+		</jaxrs:providers>
+		<jaxrs:serviceBeans>
+			<ref bean="employeeWebService" />		
+		</jaxrs:serviceBeans>
+		<jaxrs:extensionMappings>
+			<entry key="xml" value="application/xml" />
+			<entry key="json" value="application/json" />
+		</jaxrs:extensionMappings>
+		<jaxrs:properties>
+			<entry key="org.apache.cxf.Logger" value="org.apache.cxf.common.logging.Log4jLogger" />
+		</jaxrs:properties>
+	</jaxrs:server>
+
+	<!-- DataSource -->
+
+	<bean id="dataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="${datasource.driver}" />
+		<property name="url" value="${datasource.url}" />
+		<property name="username" value="${datasource.username}" />
+		<property name="password" value="${datasource.password}" />
+	</bean>
+
+	<!-- JDBC Template -->
+	
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+  		<property name="dataSource" ref="dataSource"/>
+	</bean>
+
+	<!-- Transaction management -->
+	<tx:annotation-driven />
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+</beans>
